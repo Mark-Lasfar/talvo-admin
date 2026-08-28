@@ -100,22 +100,22 @@ export const TenantForm: React.FC<TenantFormProps> = ({
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
-      // ✅ تحضير البيانات للإرسال
+      // ✅ استبعد الحقول غير المطلوبة في الإنشاء
+      const { last_heartbeat, is_online, subscription_days, ...rest } = data;
+      
       const payload = {
-        ...data,
-        primary_server_url: data.primary_server_url || undefined,
-        primary_server_ip: data.primary_server_ip || undefined,
-        primary_server_port: data.primary_server_port || 5000,
-        is_primary_server: data.is_primary_server || false,
+        ...rest,
+        primary_server_url: rest.primary_server_url || undefined,
+        primary_server_ip: rest.primary_server_ip || undefined,
+        primary_server_port: rest.primary_server_port || 5000,
+        is_primary_server: rest.is_primary_server || false,
       };
 
       if (tenant) {
-        // ✅ عند التحديث: نحذف subscription_days لأنها موجودة فقط في الإنشاء
-        const { subscription_days, ...updateData } = payload;
-        await updateTenant(tenant.id, updateData);
+        await updateTenant(tenant.id, payload);
       } else {
-        // ✅ عند الإنشاء: نرسل كل البيانات
-        await createTenant(payload as TenantCreate);
+        // ✅ أضف subscription_days فقط في حالة الإنشاء
+        await createTenant({ ...payload, subscription_days: data.subscription_days });
       }
       onSuccess();
     } finally {
