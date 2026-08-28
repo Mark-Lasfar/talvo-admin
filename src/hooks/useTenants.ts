@@ -92,6 +92,21 @@ export const useTenants = () => {
     }
   }, []);
 
+    // ✅ ✅ ✅ دالة جديدة: إرسال نبضة
+  const sendHeartbeat = useCallback(async (id: number) => {
+    try {
+      const response = await tenantsApi.heartbeat(id, {
+        is_online: true,
+      });
+      toast.success('✅ تم تحديث حالة السيرفر');
+      return { success: true, data: response };
+    } catch (error) {
+      toast.error('فشل إرسال النبضة');
+      return { success: false };
+    }
+  }, []);
+
+
   useEffect(() => {
     loadTenants();
   }, [loadTenants]);
@@ -107,5 +122,6 @@ export const useTenants = () => {
     deleteTenant,
     toggleStatus,
     regenerateLicense,
+    sendHeartbeat,
   };
 };

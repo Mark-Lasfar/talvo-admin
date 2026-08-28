@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tenant } from '@/types';
-import { X, Building2, Users, Key, Calendar, Clock, Mail, Phone, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { X, Building2, Users, Key, Calendar, Clock, Mail, Phone, MapPin, CheckCircle, XCircle, Server, Wifi, WifiOff, Globe } from 'lucide-react';
 import { useTenants } from '@/hooks/useTenants';
 import toast from 'react-hot-toast';
 
@@ -40,8 +40,21 @@ export const TenantDetails: React.FC<TenantDetailsProps> = ({ tenant, onClose, o
     return { label: 'نشط', color: 'text-green-600', icon: CheckCircle };
   };
 
+  // ✅ ✅ ✅ دالة لحالة السيرفر
+  const getServerStatus = () => {
+    if (!tenant.is_primary_server) {
+      return { label: 'غير مُعد', color: 'text-gray-400', icon: Server };
+    }
+    if (tenant.is_online) {
+      return { label: '🟢 متصل', color: 'text-green-600', icon: Wifi };
+    }
+    return { label: '🔴 غير متصل', color: 'text-red-600', icon: WifiOff };
+  };
+
   const status = getStatus();
   const StatusIcon = status.icon;
+  const serverStatus = getServerStatus();
+  const ServerIcon = serverStatus.icon;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -136,6 +149,59 @@ export const TenantDetails: React.FC<TenantDetailsProps> = ({ tenant, onClose, o
                   {tenant.subscription_expiry ? formatDate(tenant.subscription_expiry) : 'غير محدود'}
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* ✅ ✅ ✅ معلومات السيرفر (جديد) */}
+          <div className="space-y-2">
+            <h4 className="font-medium text-gray-700 flex items-center gap-2">
+              <Server size={16} className="text-gray-400" />
+              معلومات السيرفر
+            </h4>
+            <div className="grid grid-cols-2 gap-2 text-sm bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+              <div className="col-span-2">
+                <div className="flex items-center gap-2">
+                  <ServerIcon className={serverStatus.color} size={16} />
+                  <span className={`font-medium ${serverStatus.color}`}>
+                    الحالة: {serverStatus.label}
+                  </span>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-xs text-gray-400">سيرفر رئيسي</p>
+                <p className="font-medium text-gray-700">
+                  {tenant.is_primary_server ? '✅ نعم' : '❌ لا'}
+                </p>
+              </div>
+              
+              <div>
+                <p className="text-xs text-gray-400">المنفذ</p>
+                <p className="font-medium text-gray-700">{tenant.primary_server_port || 5000}</p>
+              </div>
+              
+              {tenant.primary_server_ip && (
+                <div>
+                  <p className="text-xs text-gray-400">IP</p>
+                  <p className="font-mono text-sm text-gray-700" dir="ltr">{tenant.primary_server_ip}</p>
+                </div>
+              )}
+              
+              {tenant.primary_server_url && (
+                <div className="col-span-2">
+                  <p className="text-xs text-gray-400">الرابط</p>
+                  <p className="font-mono text-sm text-blue-600 truncate" dir="ltr">
+                    {tenant.primary_server_url}
+                  </p>
+                </div>
+              )}
+              
+              {tenant.last_heartbeat && (
+                <div className="col-span-2">
+                  <p className="text-xs text-gray-400">آخر نبضة</p>
+                  <p className="font-medium text-gray-700">{formatDate(tenant.last_heartbeat)}</p>
+                </div>
+              )}
             </div>
           </div>
 

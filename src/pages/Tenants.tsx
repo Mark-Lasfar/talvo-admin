@@ -1,40 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { useTenants } from '@/hooks/useTenants';
-import { TenantCard } from '@/components/tenants/TenantCard';
 import { TenantForm } from '@/components/tenants/TenantForm';
-import { Plus, Search, Building2, RefreshCw } from 'lucide-react';
+import { 
+  Building2, 
+  Plus, 
+  Edit2, 
+  Trash2, 
+  Power, 
+  RefreshCw,
+  Server,
+  Wifi,
+  WifiOff,
+  Eye
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const Tenants: React.FC = () => {
-  const { tenants, loading, loadTenants } = useTenants();
+  const { tenants, loading, loadTenants, deleteTenant, toggleStatus } = useTenants();
   const [showForm, setShowForm] = useState(false);
   const [editingTenant, setEditingTenant] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // ✅ تحميل البيانات عند فتح الصفحة
   useEffect(() => {
     loadTenants();
   }, []);
 
+  // ✅ ✅ ✅ دالة لعرض حالة السيرفر
+  const getServerStatusBadge = (tenant: any) => {
+    if (!tenant.is_primary_server) {
+      return { label: 'غير مُعد', color: 'bg-gray-100 text-gray-500' };
+    }
+    if (tenant.is_online) {
+      return { label: '🟢 متصل', color: 'bg-green-100 text-green-600' };
+    }
+    return { label: '🔴 غير متصل', color: 'bg-red-100 text-red-600' };
+  };
+
   const filteredTenants = tenants.filter((t) =>
     t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    t.arabic_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    t.arabic_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.license_key.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  const handleRefresh = () => {
-    loadTenants();
-    toast.success('تم تحديث البيانات');
-  };
-
-  const handleEdit = (tenant: any) => {
-    setEditingTenant(tenant);
-    setShowForm(true);
-  };
-
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setEditingTenant(null);
-  };
 
   return (
     <div>
@@ -43,86 +49,161 @@ export const Tenants: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">🏢 المستأجرين</h1>
           <p className="text-gray-500">
-            إدارة الشركات والمؤسسات المستخدمة للنظام 
-            <span className="text-blue-600 font-medium mr-2">
-              ({tenants.length} مستأجر)
-            </span>
+            إدارة الشركات والمؤسسات المسجلة في النظام
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={handleRefresh}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition"
-            title="تحديث"
-          >
-            <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
-          </button>
-          <button
-            onClick={() => setShowForm(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
-          >
-            <Plus size={18} />
-            إضافة مستأجر
-          </button>
-        </div>
+        <button
+          onClick={() => {
+            setEditingTenant(null);
+            setShowForm(true);
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+        >
+          <Plus size={18} />
+          إضافة مستأجر
+        </button>
       </div>
 
       {/* ✅ شريط البحث */}
       <div className="mb-6">
-        <div className="relative max-w-md">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-          <input
-            type="text"
-            placeholder="بحث عن مستأجر..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="بحث عن مستأجر..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+        />
       </div>
 
-      {/* ✅ قائمة المستأجرين */}
+      {/* ✅ الجدول */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <div className="w-12 h-12 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
         </div>
-      ) : filteredTenants.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
-          <Building2 className="mx-auto text-gray-300" size={48} />
-          <p className="text-gray-500 mt-2">
-            {searchTerm ? 'لا توجد نتائج مطابقة للبحث' : 'لا توجد مستأجرين'}
-          </p>
-          {!searchTerm && (
-            <button
-              onClick={() => setShowForm(true)}
-              className="mt-4 text-blue-600 hover:text-blue-700 font-medium"
-            >
-              إضافة مستأجر جديد
-            </button>
-          )}
-        </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {filteredTenants.map((tenant) => (
-            <TenantCard 
-              key={tenant.id} 
-              tenant={tenant} 
-              onUpdate={loadTenants}
-              onEdit={() => handleEdit(tenant)}
-            />
-          ))}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">#</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">الاسم</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">المفتاح</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">المستخدمين</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">الخطة</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">الحالة</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">السيرفر</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-500">الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredTenants.map((tenant, index) => {
+                  const serverStatus = getServerStatusBadge(tenant);
+                  return (
+                    <tr key={tenant.id} className="border-b hover:bg-gray-50 transition">
+                      <td className="px-4 py-3 text-sm text-gray-500">{index + 1}</td>
+                      <td className="px-4 py-3">
+                        <div>
+                          <div className="font-medium text-gray-800">{tenant.arabic_name || tenant.name}</div>
+                          <div className="text-xs text-gray-400">{tenant.name}</div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <code className="text-xs font-mono bg-gray-100 px-2 py-1 rounded" dir="ltr">
+                          {tenant.license_key.slice(0, 8)}...
+                        </code>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {tenant.total_users}/{tenant.max_users}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="capitalize text-sm text-gray-600">
+                          {tenant.subscription_plan}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          tenant.is_active ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
+                        }`}>
+                          {tenant.is_active ? '✅ نشط' : '⛔ غير نشط'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${serverStatus.color}`}>
+                            {serverStatus.label}
+                          </span>
+                          {tenant.is_primary_server && tenant.is_online && (
+                            <span className="text-xs text-gray-400" dir="ltr">
+                              {tenant.primary_server_ip}:{tenant.primary_server_port}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => {
+                              setEditingTenant(tenant);
+                              setShowForm(true);
+                            }}
+                            className="p-1.5 hover:bg-blue-50 rounded text-blue-500 transition"
+                            title="تعديل"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button
+                            onClick={() => toggleStatus(tenant.id)}
+                            className={`p-1.5 rounded transition ${
+                              tenant.is_active
+                                ? 'hover:bg-yellow-50 text-yellow-500'
+                                : 'hover:bg-green-50 text-green-500'
+                            }`}
+                            title={tenant.is_active ? 'تعطيل' : 'تفعيل'}
+                          >
+                            <Power size={16} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm('هل أنت متأكد من حذف هذا المستأجر؟')) {
+                                deleteTenant(tenant.id);
+                              }
+                            }}
+                            className="p-1.5 hover:bg-red-50 rounded text-red-500 transition"
+                            title="حذف"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          
+          {filteredTenants.length === 0 && (
+            <div className="text-center py-12">
+              <Building2 className="mx-auto text-gray-300" size={48} />
+              <p className="text-gray-500 mt-2">لا توجد مستأجرين</p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* ✅ نافذة إضافة/تعديل مستأجر */}
+      {/* ✅ نموذج الإضافة/التعديل */}
       {showForm && (
         <TenantForm
           tenant={editingTenant}
-          onClose={handleCloseForm}
+          onClose={() => {
+            setShowForm(false);
+            setEditingTenant(null);
+          }}
           onSuccess={() => {
-            handleCloseForm();
+            setShowForm(false);
+            setEditingTenant(null);
             loadTenants();
-            toast.success(editingTenant ? 'تم تحديث المستأجر بنجاح' : 'تم إنشاء المستأجر بنجاح');
           }}
         />
       )}

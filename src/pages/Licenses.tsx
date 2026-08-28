@@ -190,6 +190,45 @@ export const Licenses: React.FC = () => {
                     <span>{new Date(tenant.created_at).toLocaleDateString('ar-EG')}</span>
                   </div>
                 </div>
+                {/* ✅ ✅ ✅ حالة السيرفر */}
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500">حالة السيرفر:</span>
+                    <div className="flex items-center gap-2">
+                      {tenant.is_primary_server ? (
+                        <>
+                          {tenant.is_online ? (
+                            <span className="flex items-center gap-1 text-sm text-green-600">
+                              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                              متصل
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 text-sm text-red-600">
+                              <span className="w-2 h-2 bg-red-500 rounded-full" />
+                              غير متصل
+                            </span>
+                          )}
+                          {tenant.primary_server_ip && (
+                            <span className="text-xs text-gray-400" dir="ltr">
+                              {tenant.primary_server_ip}:{tenant.primary_server_port}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-sm text-gray-400">غير مُعد</span>
+                      )}
+                    </div>
+                  </div>
+                  {tenant.last_heartbeat && (
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-xs text-gray-400">آخر نبضة:</span>
+                      <span className="text-xs text-gray-400">
+                        {new Date(tenant.last_heartbeat).toLocaleString('ar-EG')}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
               </div>
             );
           })}

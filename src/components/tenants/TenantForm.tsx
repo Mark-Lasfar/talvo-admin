@@ -18,6 +18,14 @@ const tenantSchema = z.object({
   max_users: z.number().min(1, 'عدد المستخدمين مطلوب'),
   subscription_days: z.number().min(30, 'مدة الاشتراك يجب أن تكون 30 يوم على الأقل'),
   is_active: z.boolean().default(true),
+
+  // ✅ ✅ ✅ حقول السيرفر
+  is_primary_server: z.boolean().optional(),
+  primary_server_url: z.string().url('رابط غير صحيح').optional().or(z.literal('')),
+  primary_server_ip: z.string().optional().or(z.literal('')),
+  primary_server_port: z.number().min(1).max(65535).optional(),
+  is_online: z.boolean().optional(),
+  last_heartbeat: z.string().optional().or(z.literal('')),
 });
 
 type FormData = z.infer<typeof tenantSchema>;
@@ -54,6 +62,14 @@ export const TenantForm: React.FC<TenantFormProps> = ({
       max_users: tenant?.max_users || 5,
       subscription_days: 365,
       is_active: tenant?.is_active ?? true,
+
+      // ✅ ✅ ✅ حقول السيرفر
+      is_primary_server: tenant?.is_primary_server || false,
+      primary_server_url: tenant?.primary_server_url || '',
+      primary_server_ip: tenant?.primary_server_ip || '',
+      primary_server_port: tenant?.primary_server_port || 5000,
+      is_online: tenant?.is_online || false,
+      last_heartbeat: tenant?.last_heartbeat || '',
     },
   });
 
@@ -69,6 +85,14 @@ export const TenantForm: React.FC<TenantFormProps> = ({
         max_users: tenant.max_users,
         subscription_days: 365,
         is_active: tenant.is_active,
+
+        // ✅ ✅ ✅ حقول السيرفر
+        is_primary_server: tenant.is_primary_server || false,
+        primary_server_url: tenant.primary_server_url || '',
+        primary_server_ip: tenant.primary_server_ip || '',
+        primary_server_port: tenant.primary_server_port || 5000,
+        is_online: tenant.is_online || false,
+        last_heartbeat: tenant.last_heartbeat || '',
       });
     }
   }, [tenant, reset]);
@@ -76,10 +100,22 @@ export const TenantForm: React.FC<TenantFormProps> = ({
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try {
+      // ✅ تحضير البيانات للإرسال
+      const payload = {
+        ...data,
+        primary_server_url: data.primary_server_url || undefined,
+        primary_server_ip: data.primary_server_ip || undefined,
+        primary_server_port: data.primary_server_port || 5000,
+        is_primary_server: data.is_primary_server || false,
+      };
+
       if (tenant) {
-        await updateTenant(tenant.id, data);
+        // ✅ عند التحديث: نحذف subscription_days لأنها موجودة فقط في الإنشاء
+        const { subscription_days, ...updateData } = payload;
+        await updateTenant(tenant.id, updateData);
       } else {
-        await createTenant(data as TenantCreate);
+        // ✅ عند الإنشاء: نرسل كل البيانات
+        await createTenant(payload as TenantCreate);
       }
       onSuccess();
     } finally {
@@ -228,6 +264,101 @@ export const TenantForm: React.FC<TenantFormProps> = ({
             </div>
           </div>
 
+          {/* ✅ ✅ ✅ قسم إعدادات السيرفر */}
+          <div className="border-t border-gray-200 pt-4 mt-2">
+            <h4 className="text-md font-semibold text-gray-700 mb-3 flex items-center gap-2">
+              <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+              </svg>
+              إعدادات السيرفر
+              {tenant?.is_primary_server && (
+                <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
+                  سيرفر رئيسي
+                </span>
+              )}
+            </h4>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  {...register('is_primary_server')}
+                  type="checkbox"
+                  id="isPrimaryServer"
+                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                />
+                <label htmlFor="isPrimaryServer" className="text-sm text-gray-700">
+                  هذا الجهاز سيرفر رئيسي
+                </label>
+              </div>
+
+              {tenant?.is_primary_server && (
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">الحالة:</span>
+                  {tenant.is_online ? (
+                    <span className="flex items-center gap-1 text-sm text-green-600">
+                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      متصل
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-sm text-red-600">
+                      <span className="w-2 h-2 bg-red-500 rounded-full" />
+                      غير متصل
+                    </span>
+                  )}
+                  {tenant.last_heartbeat && (
+                    <span className="text-xs text-gray-400">
+                      آخر نبضة: {new Date(tenant.last_heartbeat).toLocaleString('ar-EG')}
+                    </span>
+                  )}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  رابط السيرفر
+                </label>
+                <input
+                  {...register('primary_server_url')}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition font-mono text-sm"
+                  placeholder="http://192.168.1.100:5000"
+                  dir="ltr"
+                />
+                {errors.primary_server_url && (
+                  <p className="text-red-500 text-xs mt-1">{errors.primary_server_url.message}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  IP السيرفر
+                </label>
+                <input
+                  {...register('primary_server_ip')}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition font-mono text-sm"
+                  placeholder="192.168.1.100"
+                  dir="ltr"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  المنفذ
+                </label>
+                <input
+                  {...register('primary_server_port', { valueAsNumber: true })}
+                  type="number"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition font-mono text-sm"
+                  placeholder="5000"
+                  min="1"
+                  max="65535"
+                />
+                {errors.primary_server_port && (
+                  <p className="text-red-500 text-xs mt-1">{errors.primary_server_port.message}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* ✅ الأزرار */}
           <div className="flex items-center gap-3 pt-4 border-t">
             <button
@@ -241,7 +372,7 @@ export const TenantForm: React.FC<TenantFormProps> = ({
                   جاري الحفظ...
                 </span>
               ) : (
-                tenant ? 'تحديث' : 'إنشاء'
+                tenant ? '💾 تحديث' : '➕ إنشاء'
               )}
             </button>
             <button

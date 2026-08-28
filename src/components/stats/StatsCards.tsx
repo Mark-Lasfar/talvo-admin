@@ -1,7 +1,7 @@
 // src/components/stats/StatsCards.tsx
 import React from 'react';
 import { SystemStats } from '@/types';
-import { Building2, Users, Key, DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { Building2, Users, Key, DollarSign, Server, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface StatsCardsProps {
   stats: SystemStats | null;
@@ -51,6 +51,14 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ stats, loading }) => {
       icon: DollarSign,
       color: 'green',
     },
+    // ✅ ✅ ✅ بطاقة السيرفر الجديدة
+    {
+      label: 'السيرفرات',
+      value: stats.total_servers || 0,
+      sub: `🟢 ${stats.online_servers || 0} متصل | 🔴 ${stats.offline_servers || 0} غير متصل`,
+      icon: Server,
+      color: 'indigo',
+    },
   ];
 
   const colorClasses = {
@@ -58,10 +66,11 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ stats, loading }) => {
     purple: 'bg-purple-50 text-purple-600',
     yellow: 'bg-yellow-50 text-yellow-600',
     green: 'bg-green-50 text-green-600',
+    indigo: 'bg-indigo-50 text-indigo-600',
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       {cards.map((card) => (
         <div
           key={card.label}

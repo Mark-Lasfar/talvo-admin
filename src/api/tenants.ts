@@ -29,4 +29,16 @@ export const tenantsApi = {
     api.post<{ success: boolean; license_key: string }>(
       `/api/v1/licenses/${id}/regenerate`
     ),
+
+  heartbeat: (id: number, data?: {
+      is_online?: boolean;
+      primary_server_url?: string;
+      primary_server_ip?: string;
+      primary_server_port?: number;
+    }) =>
+      api.post<{ success: boolean; message: string; tenant: Tenant }>(
+        `/api/v1/tenants/${id}/heartbeat`,
+        data || {}
+      ),
+
 };

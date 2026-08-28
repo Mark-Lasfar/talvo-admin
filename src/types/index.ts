@@ -21,6 +21,12 @@ export interface Tenant {
   max_storage_mb: number;
   subscription_plan: 'basic' | 'pro' | 'enterprise';
   subscription_expiry: string | null;
+  is_primary_server: boolean;
+  primary_server_url: string | null;
+  primary_server_ip: string | null;
+  primary_server_port: number;
+  is_online: boolean;
+  last_heartbeat: string | null;
   can_manage_products: boolean;
   can_manage_sales: boolean;
   can_manage_purchases: boolean;
@@ -41,7 +47,8 @@ export interface Tenant {
   created_at: string;
   updated_at: string;
   last_login: string | null;
-  is_deleted?: boolean;
+  is_deleted?: boolean;  
+
 }
 
 export interface TenantCreate {
@@ -54,6 +61,12 @@ export interface TenantCreate {
   max_users: number;
   subscription_days: number;
   is_active?: boolean;
+  is_primary_server?: boolean;
+  primary_server_url?: string | null;
+  primary_server_ip?: string | null;
+  primary_server_port?: number;
+  is_online?: boolean;
+
   can_manage_products?: boolean;
   can_manage_sales?: boolean;
   can_manage_purchases?: boolean;
@@ -80,6 +93,12 @@ export interface TenantUpdate {
   max_users?: number;
   subscription_days?: number;
   is_active?: boolean;
+  is_primary_server?: boolean;
+  primary_server_url?: string | null;
+  primary_server_ip?: string | null;
+  primary_server_port?: number;
+  is_online?: boolean;
+  last_heartbeat?: string | null;
   can_manage_products?: boolean;
   can_manage_sales?: boolean;
   can_manage_purchases?: boolean;
@@ -160,6 +179,10 @@ export interface SystemStats {
     pro: number;
     enterprise: number;
   };
+  total_servers: number;
+  online_servers: number;
+  offline_servers: number;
+
 }
 
 // =============================================

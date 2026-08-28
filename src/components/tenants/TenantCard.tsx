@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tenant } from '@/types';
 import { useTenants } from '@/hooks/useTenants';
-import { Edit, Trash2, RefreshCw, Copy, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Edit, Trash2, RefreshCw, Copy, CheckCircle, XCircle, Eye, Server, Wifi, WifiOff } from 'lucide-react';
 import { TenantForm } from './TenantForm';
 import { TenantDetails } from './TenantDetails';
 import toast from 'react-hot-toast';
@@ -82,6 +82,19 @@ export const TenantCard: React.FC<TenantCardProps> = ({ tenant, onUpdate, onEdit
     expired: '⏳ منتهي الاشتراك',
   };
 
+  // ✅ ✅ ✅ دالة لحالة السيرفر
+  const getServerStatus = () => {
+    if (!tenant.is_primary_server) {
+      return { label: 'غير مُعد', color: 'text-gray-400', icon: null };
+    }
+    if (tenant.is_online) {
+      return { label: '🟢 متصل', color: 'text-green-600', icon: Wifi };
+    }
+    return { label: '🔴 غير متصل', color: 'text-red-600', icon: WifiOff };
+  };
+
+  const serverStatus = getServerStatus();
+
   return (
     <>
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition cursor-pointer" onClick={() => setShowDetails(true)}>
@@ -131,6 +144,28 @@ export const TenantCard: React.FC<TenantCardProps> = ({ tenant, onUpdate, onEdit
               </span>
             </div>
           )}
+
+          {/* ✅ ✅ ✅ حالة السيرفر (جديد) */}
+          <div className="col-span-2 text-gray-500 border-t border-gray-100 pt-2 mt-1">
+            <div className="flex items-center justify-between">
+              <span className="block text-xs">حالة السيرفر</span>
+              <div className="flex items-center gap-2">
+                <span className={`text-sm font-medium ${serverStatus.color}`}>
+                  {serverStatus.label}
+                </span>
+                {tenant.is_primary_server && tenant.is_online && tenant.primary_server_ip && (
+                  <span className="text-xs text-gray-400" dir="ltr">
+                    {tenant.primary_server_ip}:{tenant.primary_server_port}
+                  </span>
+                )}
+                {tenant.is_primary_server && tenant.last_heartbeat && (
+                  <span className="text-xs text-gray-400">
+                    {new Date(tenant.last_heartbeat).toLocaleTimeString('ar-EG')}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ✅ الأزرار */}
