@@ -12,7 +12,8 @@ import {
   X,
   Users,
   Shield,
-  Database
+  Database,
+  Network
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,6 +26,7 @@ interface SidebarProps {
 const menuItems = [
   { path: '/dashboard', icon: Home, label: 'لوحة التحكم' },
   { path: '/tenants', icon: Building2, label: 'المستأجرين' },
+  { path: '/branches', icon: Network, label: 'الفروع' },
   { path: '/licenses', icon: Key, label: 'المفاتيح' },
   { path: '/settings', icon: Settings, label: 'الإعدادات' },
 ];

@@ -5,6 +5,7 @@ import { Layout } from './components/layout/Layout';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { Tenants } from './pages/Tenants';
+import { Branches } from './pages/Branches';
 import { Licenses } from './pages/Licenses';
 import { Settings } from './pages/Settings';
 import { useAuth } from './hooks/useAuth';
@@ -41,6 +42,7 @@ function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="tenants" element={<Tenants />} />
+          <Route path="branches" element={<Branches />} />
           <Route path="licenses" element={<Licenses />} />
           <Route path="settings" element={<Settings />} />
         </Route>

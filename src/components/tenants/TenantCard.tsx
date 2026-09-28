@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Tenant } from '@/types';
 import { useTenants } from '@/hooks/useTenants';
-import { Edit, Trash2, RefreshCw, Copy, CheckCircle, XCircle, Eye, Server, Wifi, WifiOff } from 'lucide-react';
+import { Edit, Trash2, RefreshCw, Copy, CheckCircle, XCircle, Eye, Server, Wifi, WifiOff, Network } from 'lucide-react';
 import { TenantForm } from './TenantForm';
 import { TenantDetails } from './TenantDetails';
 import toast from 'react-hot-toast';
-
+import { BranchesManager } from '../branches/BranchesManager';
 interface TenantCardProps {
   tenant: Tenant;
   onUpdate: () => void;
@@ -15,6 +15,7 @@ interface TenantCardProps {
 export const TenantCard: React.FC<TenantCardProps> = ({ tenant, onUpdate, onEdit }) => {
   const { deleteTenant, toggleStatus, regenerateLicense } = useTenants();
   const [showDetails, setShowDetails] = useState(false);
+  const [showBranches, setShowBranches] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
 
@@ -171,6 +172,13 @@ export const TenantCard: React.FC<TenantCardProps> = ({ tenant, onUpdate, onEdit
         {/* ✅ الأزرار */}
         <div className="mt-4 flex items-center gap-2 border-t pt-3" onClick={(e) => e.stopPropagation()}>
           <button
+            onClick={(e) => { e.stopPropagation(); setShowBranches(true); }}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm text-purple-600 hover:bg-purple-50 rounded-lg transition"
+          >
+            <Network size={16} />
+            الفروع
+          </button>
+          <button
             onClick={() => { setShowEdit(true); if (onEdit) onEdit(); }}
             className="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg transition"
           >
@@ -226,6 +234,14 @@ export const TenantCard: React.FC<TenantCardProps> = ({ tenant, onUpdate, onEdit
             setShowEdit(false);
             onUpdate();
           }}
+        />
+      )}
+
+      {/* ✅ ✅ ✅ نافذة إدارة الفروع */}
+      {showBranches && (
+        <BranchesManager
+          tenant={tenant}
+          onClose={() => setShowBranches(false)}
         />
       )}
     </>

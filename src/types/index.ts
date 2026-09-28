@@ -182,6 +182,13 @@ export interface SystemStats {
   total_servers: number;
   online_servers: number;
   offline_servers: number;
+  // ✅ ✅ ✅ الفروع
+  total_branches?: number;
+  online_branches?: number;
+  offline_branches?: number;
+  active_branches?: number;
+  inactive_branches?: number;
+
 
 }
 
@@ -237,6 +244,59 @@ export interface ApiResponse<T> {
   data?: T;
   message?: string;
   error?: string;
+}
+
+// =============================================
+// ✅ أنواع الفروع (Branches)
+// =============================================
+
+export interface Branch {
+  id: number;
+  tenant_id: number;
+  branch_code: string;
+  branch_name: string;
+  arabic_name?: string | null;
+  is_active: boolean;
+  is_online: boolean;
+  last_seen?: string | null;
+  last_login?: string | null;
+  device_name?: string | null;
+  device_ip?: string | null;
+  total_users: number;
+  created_at: string;
+  updated_at: string;
+  is_deleted?: boolean;
+}
+
+export interface BranchCreate {
+  branch_name: string;
+  arabic_name?: string;
+}
+
+export interface BranchUpdate {
+  branch_name?: string;
+  arabic_name?: string;
+  is_active?: boolean;
+  device_name?: string;
+}
+
+export interface BranchValidateResponse {
+  valid: boolean;
+  branch?: {
+    id: number;
+    branch_code: string;
+    branch_name: string;
+    arabic_name?: string;
+    tenant_id: number;
+    is_active: boolean;
+    is_online: boolean;
+  };
+  tenant?: Tenant;
+  message?: string;
+}
+
+export interface BranchHeartbeatData {
+  device_name?: string;
 }
 
 export interface PaginatedResponse<T> {

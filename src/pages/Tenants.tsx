@@ -11,12 +11,16 @@ import {
   Server,
   Wifi,
   WifiOff,
+  Network,
   Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { BranchesManager } from '@/components/branches/BranchesManager';  // ✅ جديد
+
 
 export const Tenants: React.FC = () => {
   const { tenants, loading, loadTenants, deleteTenant, toggleStatus } = useTenants();
+  const [showBranches, setShowBranches] = useState<any>(null);  // ✅ جديد
   const [showForm, setShowForm] = useState(false);
   const [editingTenant, setEditingTenant] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -143,6 +147,13 @@ export const Tenants: React.FC = () => {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
                           <button
+                            onClick={() => setShowBranches(tenant)}
+                            className="p-1.5 hover:bg-purple-50 rounded text-purple-500 transition"
+                            title="إدارة الفروع"
+                          >
+                            <Network size={16} />
+                          </button>
+                          <button
                             onClick={() => {
                               setEditingTenant(tenant);
                               setShowForm(true);
@@ -207,6 +218,15 @@ export const Tenants: React.FC = () => {
           }}
         />
       )}
+      
+      {/* ✅ ✅ ✅ نافذة إدارة الفروع (جديد) */}
+      {showBranches && (
+        <BranchesManager
+          tenant={showBranches}
+          onClose={() => setShowBranches(null)}
+        />
+      )}
+      
     </div>
   );
 };
