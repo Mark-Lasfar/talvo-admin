@@ -59,4 +59,39 @@ export const branchesApi = {
     api.post<{ success: boolean; branch: Branch; message: string }>(
       `/api/v1/branches/${id}/toggle-status`
     ),
+
+      // ═══════════════════════════════════════════════════════
+  // ✅ ✅ ✅ Nebula VPN
+  // ═══════════════════════════════════════════════════════
+  
+  // ✅ الفرع يطلب شهادة Nebula
+  requestNebulaCert: (branchCode: string) =>
+    api.post<{
+      success: boolean;
+      branch: any;
+      tenant: any;
+    }>(`/api/v1/branches/${branchCode}/request-nebula-cert`),
+
+  // ✅ نبضة Nebula من الفرع
+  nebulaHeartbeat: (branchCode: string) =>
+    api.post<{ 
+      success: boolean; 
+      message: string;
+    }>(
+      `/api/v1/branches/${branchCode}/nebula-heartbeat`
+    ),
+
+  // ✅ Master يؤكد إصدار الشهادة
+  confirmNebulaCert: (id: number, data: {
+    nebula_device_id: number;
+    nebula_vpn_ip: string;
+  }) =>
+    api.post<{ 
+      success: boolean; 
+      message: string;
+      branch: Branch;
+    }>(
+      `/api/v1/branches/${id}/confirm-nebula-cert`,
+      data
+    ),
 };

@@ -21,6 +21,9 @@ import {
   RefreshCw,
   ExternalLink,
   Eye,
+  ShoppingCart,
+  Globe,
+  Copy,
 } from 'lucide-react';
 import { useTenants } from '@/hooks/useTenants';
 import { branchesApi } from '@/api/branches';
@@ -296,6 +299,133 @@ export const TenantDetails: React.FC<TenantDetailsProps> = ({
               </div>
             </div>
 
+            {/* ✅ ✅ ✅ قسم Nebula VPN */}
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-700 flex items-center gap-2">
+                <Network size={16} className="text-gray-400" />
+                Nebula VPN
+              </h4>
+              <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-400">الحالة</p>
+                    <p className={`font-medium ${tenant.nebula_enabled ? 'text-green-600' : 'text-gray-400'}`}>
+                      {tenant.nebula_enabled ? '✅ مفعّل' : '❌ غير مفعّل'}
+                    </p>
+                  </div>
+                  
+                  {tenant.nebula_enabled && (
+                    <>
+                      <div>
+                        <p className="text-xs text-gray-400">Lighthouse IP</p>
+                        <p className="font-mono text-sm text-gray-700" dir="ltr">
+                          {tenant.nebula_lighthouse_ip || '-'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400">Network</p>
+                        <p className="font-mono text-sm text-gray-700" dir="ltr">
+                          {tenant.nebula_network || '-'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400">Public IP</p>
+                        <p className="font-mono text-sm text-gray-700" dir="ltr">
+                          {tenant.nebula_public_ip || '-'}
+                        </p>
+                      </div>
+                      {tenant.nebula_last_sync && (
+                        <div className="col-span-2">
+                          <p className="text-xs text-gray-400">آخر مزامنة</p>
+                          <p className="text-xs text-gray-700">
+                            {formatDate(tenant.nebula_last_sync)}
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* ✅ ✅ ✅ قسم المتجر الإلكتروني */}
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-700 flex items-center gap-2">
+                <ShoppingCart size={16} className="text-gray-400" />
+                المتجر الإلكتروني
+              </h4>
+              <div className="bg-orange-50/50 p-3 rounded-lg border border-orange-100">
+                <div className="flex items-center justify-between mb-3">
+                  <span className={`text-sm font-medium ${tenant.shop_enabled ? 'text-green-600' : 'text-gray-400'}`}>
+                    {tenant.shop_enabled ? '✅ مفعّل' : '❌ غير مفعّل'}
+                  </span>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const { tenantsApi } = await import('@/api/tenants');
+                        const response = await tenantsApi.toggleShop(tenant.id, !tenant.shop_enabled);
+                        if (response.success) {
+                          toast.success(response.message);
+                          onUpdate();
+                        }
+                      } catch (error) {
+                        toast.error('فشل تغيير حالة المتجر');
+                      }
+                    }}
+                    className={`px-3 py-1 text-xs rounded-lg transition font-medium ${
+                      tenant.shop_enabled
+                        ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                        : 'bg-green-100 text-green-600 hover:bg-green-200'
+                    }`}
+                  >
+                    {tenant.shop_enabled ? 'تعطيل المتجر' : 'تفعيل المتجر'}
+                  </button>
+                </div>
+                
+                {tenant.shop_url && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-400 mb-1">رابط المتجر</p>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={tenant.shop_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-mono text-blue-600 hover:underline break-all flex-1"
+                        dir="ltr"
+                      >
+                        {tenant.shop_url}
+                      </a>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(tenant.shop_url || '');
+                          toast.success('تم نسخ الرابط');
+                        }}
+                        className="p-1 hover:bg-orange-100 rounded transition"
+                        title="نسخ الرابط"
+                      >
+                        <Copy size={14} className="text-gray-400" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {tenant.shop_enabled && !tenant.shop_url && (
+                  <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
+                    ⏳ في انتظار جاهزية الرابط... (يستغرق حتى 5 دقائق)
+                  </div>
+                )}
+
+                {tenant.shop_enabled && tenant.shop_url && (
+                  <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+                    <p className="font-medium mb-1">🔗 رابط العميل:</p>
+                    <p className="font-mono" dir="ltr">
+                      https://shop.talvo.com/{tenant.id}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
             {/* ✅ الفروع */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">

@@ -106,6 +106,52 @@ export const useTenants = () => {
     }
   }, []);
 
+  // ═══════════════════════════════════════════════════════
+  // ✅ ✅ ✅ Nebula VPN
+  // ═══════════════════════════════════════════════════════
+  const registerNebula = useCallback(async (id: number, data: {
+    nebula_lighthouse_ip: string;
+    nebula_lighthouse_port: number;
+    nebula_network: string;
+    nebula_public_ip?: string;
+  }) => {
+    try {
+      await tenantsApi.registerNebula(id, data);
+      toast.success('✅ تم تسجيل Nebula بنجاح');
+      await loadTenants();
+      return { success: true };
+    } catch (error) {
+      toast.error('فشل تسجيل Nebula');
+      return { success: false };
+    }
+  }, [loadTenants]);
+
+  // ═══════════════════════════════════════════════════════
+  // ✅ ✅ ✅ المتجر الإلكتروني
+  // ═══════════════════════════════════════════════════════
+  const toggleShop = useCallback(async (id: number, shop_enabled?: boolean) => {
+    try {
+      const response = await tenantsApi.toggleShop(id, shop_enabled);
+      toast.success(response.message || '✅ تم تحديث حالة المتجر');
+      await loadTenants();
+      return { success: true, shop_enabled: response.shop_enabled };
+    } catch (error) {
+      toast.error('فشل تغيير حالة المتجر');
+      return { success: false };
+    }
+  }, [loadTenants]);
+
+  const saveShopUrl = useCallback(async (id: number, shop_url: string) => {
+    try {
+      await tenantsApi.saveShopUrl(id, shop_url);
+      toast.success('✅ تم حفظ رابط المتجر');
+      await loadTenants();
+      return { success: true };
+    } catch (error) {
+      toast.error('فشل حفظ رابط المتجر');
+      return { success: false };
+    }
+  }, [loadTenants]);
 
   useEffect(() => {
     loadTenants();
@@ -123,5 +169,8 @@ export const useTenants = () => {
     toggleStatus,
     regenerateLicense,
     sendHeartbeat,
+    registerNebula,
+    toggleShop,
+    saveShopUrl,
   };
 };

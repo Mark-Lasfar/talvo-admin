@@ -26,6 +26,9 @@ const tenantSchema = z.object({
   primary_server_port: z.number().min(1).max(65535).optional(),
   is_online: z.boolean().optional(),
   last_heartbeat: z.string().optional().or(z.literal('')),
+  
+  // ✅ ✅ ✅ المتجر
+  shop_enabled: z.boolean().optional(),
 });
 
 type FormData = z.infer<typeof tenantSchema>;
@@ -70,6 +73,9 @@ export const TenantForm: React.FC<TenantFormProps> = ({
       primary_server_port: tenant?.primary_server_port || 5000,
       is_online: tenant?.is_online || false,
       last_heartbeat: tenant?.last_heartbeat || '',
+            // ✅ المتجر
+      shop_enabled: tenant?.shop_enabled || false,
+
     },
   });
 
@@ -93,6 +99,9 @@ export const TenantForm: React.FC<TenantFormProps> = ({
         primary_server_port: tenant.primary_server_port || 5000,
         is_online: tenant.is_online || false,
         last_heartbeat: tenant.last_heartbeat || '',
+                // ✅ المتجر
+        shop_enabled: tenant.shop_enabled || false,
+
       });
     }
   }, [tenant, reset]);
@@ -260,6 +269,18 @@ export const TenantForm: React.FC<TenantFormProps> = ({
               />
               <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
                 نشط
+              </label>
+            </div>
+
+            <div className="flex items-center gap-2 pt-2">
+              <input
+                {...register('shop_enabled')}
+                type="checkbox"
+                id="shopEnabled"
+                className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+              />
+              <label htmlFor="shopEnabled" className="text-sm font-medium text-gray-700">
+                🛒 تفعيل المتجر الإلكتروني
               </label>
             </div>
           </div>

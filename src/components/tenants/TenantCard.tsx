@@ -146,6 +146,18 @@ export const TenantCard: React.FC<TenantCardProps> = ({ tenant, onUpdate, onEdit
             </div>
           )}
 
+          {/* ✅ ✅ ✅ حالة المتجر الإلكتروني */}
+          {tenant.shop_enabled && (
+            <div className="col-span-2 text-gray-500 border-t border-gray-100 pt-2 mt-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs">🛒 المتجر</span>
+                <span className="text-xs bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-medium">
+                  ✅ مفعّل
+                </span>
+              </div>
+            </div>
+          )}
+          
           {/* ✅ ✅ ✅ حالة السيرفر (جديد) */}
           <div className="col-span-2 text-gray-500 border-t border-gray-100 pt-2 mt-1">
             <div className="flex items-center justify-between">

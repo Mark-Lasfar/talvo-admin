@@ -242,7 +242,24 @@ export const BranchesManager: React.FC<BranchesManagerProps> = ({
                         </button>
                       </div>
                     </div>
-
+                    {/* ✅ ✅ ✅ Nebula VPN IP */}
+                    {branch.nebula_vpn_ip && (
+                      <div className="mt-2 p-2 bg-indigo-50 rounded-lg border border-indigo-100">
+                        <p className="text-xs text-gray-400 mb-1">Nebula VPN</p>
+                        <div className="flex items-center justify-between">
+                          <code className="text-xs font-mono text-indigo-600" dir="ltr">
+                            {branch.nebula_vpn_ip}
+                          </code>
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            branch.nebula_cert_issued 
+                              ? 'bg-green-100 text-green-600' 
+                              : 'bg-yellow-100 text-yellow-600'
+                          }`}>
+                            {branch.nebula_cert_issued ? '✅' : '⏳'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
                     {/* ✅ معلومات */}
                     <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-gray-500">
                       <div>

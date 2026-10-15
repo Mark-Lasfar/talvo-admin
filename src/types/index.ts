@@ -27,6 +27,19 @@ export interface Tenant {
   primary_server_port: number;
   is_online: boolean;
   last_heartbeat: string | null;
+  
+  // ✅ ✅ ✅ حقول Nebula VPN
+  nebula_enabled: boolean;
+  nebula_lighthouse_ip: string | null;
+  nebula_lighthouse_port: number;
+  nebula_network: string | null;
+  nebula_public_ip: string | null;
+  nebula_last_sync: string | null;
+  
+  // ✅ ✅ ✅ حقول المتجر الإلكتروني
+  shop_url: string | null;
+  shop_enabled: boolean;
+  
   can_manage_products: boolean;
   can_manage_sales: boolean;
   can_manage_purchases: boolean;
@@ -99,6 +112,19 @@ export interface TenantUpdate {
   primary_server_port?: number;
   is_online?: boolean;
   last_heartbeat?: string | null;
+  
+  // ✅ ✅ ✅ حقول Nebula VPN
+  nebula_enabled?: boolean;
+  nebula_lighthouse_ip?: string | null;
+  nebula_lighthouse_port?: number;
+  nebula_network?: string | null;
+  nebula_public_ip?: string | null;
+  nebula_last_sync?: string | null;
+  
+  // ✅ ✅ ✅ حقول المتجر
+  shop_url?: string | null;
+  shop_enabled?: boolean;
+  
   can_manage_products?: boolean;
   can_manage_sales?: boolean;
   can_manage_purchases?: boolean;
@@ -182,6 +208,19 @@ export interface SystemStats {
   total_servers: number;
   online_servers: number;
   offline_servers: number;
+  
+  // ✅ ✅ ✅ Nebula VPN
+  nebula_enabled_tenants?: number;
+  nebula_online_tenants?: number;
+  nebula_offline_tenants?: number;
+  nebula_branches_total?: number;
+  nebula_branches_pending?: number;
+  
+  // ✅ ✅ ✅ المتجر الإلكتروني
+  shop_enabled_tenants?: number;
+  shop_ready_tenants?: number;
+  shop_pending_tenants?: number;
+  
   // ✅ ✅ ✅ الفروع
   total_branches?: number;
   online_branches?: number;
@@ -263,6 +302,13 @@ export interface Branch {
   device_name?: string | null;
   device_ip?: string | null;
   total_users: number;
+  
+  // ✅ ✅ ✅ حقول Nebula VPN
+  nebula_device_id: number | null;
+  nebula_vpn_ip: string | null;
+  nebula_cert_issued: boolean;
+  nebula_cert_issued_at?: string | null;
+  
   created_at: string;
   updated_at: string;
   is_deleted?: boolean;

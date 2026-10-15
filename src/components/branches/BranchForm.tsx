@@ -129,12 +129,28 @@ export const BranchForm: React.FC<BranchFormProps> = ({
           )}
 
           {branch && (
-            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-              <p className="text-xs text-gray-500 mb-1">كود الفرع</p>
-              <code className="text-sm font-mono text-blue-600" dir="ltr">
-                {branch.branch_code}
-              </code>
-            </div>
+            <>
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <p className="text-xs text-gray-500 mb-1">كود الفرع</p>
+                <code className="text-sm font-mono text-blue-600" dir="ltr">
+                  {branch.branch_code}
+                </code>
+              </div>
+              
+              {branch.nebula_vpn_ip && (
+                <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                  <p className="text-xs text-gray-500 mb-1">Nebula VPN IP</p>
+                  <code className="text-sm font-mono text-indigo-600" dir="ltr">
+                    {branch.nebula_vpn_ip}
+                  </code>
+                  <p className="text-xs text-gray-500 mt-2">
+                    {branch.nebula_cert_issued 
+                      ? '✅ تم إصدار الشهادة' 
+                      : '⏳ في انتظار الشهادة'}
+                  </p>
+                </div>
+              )}
+            </>
           )}
 
           {/* ✅ الأزرار */}
